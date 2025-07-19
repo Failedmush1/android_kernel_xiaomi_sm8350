@@ -317,6 +317,55 @@ module_param_cb(ksu_debug_manager_uid, &expected_size_ops,
 
 #endif
 
+#ifdef CONFIG_KSU_SWITCH_MANAGER
+
+static int set_expected_size(const char *val, const struct kernel_param *kp)
+{
+    int rv = param_set_uint(val, kp);
+    pr_info("expected_manager_size set to %u\n", expected_manager_size);
+    return rv;
+}
+
+static int get_expected_size(char *buf, const struct kernel_param *kp)
+{
+    return snprintf(buf, PAGE_SIZE, "%u\n", expected_manager_size);
+}
+
+static int set_expected_hash(const char *val, const struct kernel_param *kp)
+{
+    if (strlen(val) != SHA256_DIGEST_SIZE * 2) {
+        pr_err("Invalid hash length: %s\n", val);
+        return -EINVAL;
+    }
+
+    strncpy(expected_manager_hash, val, SHA256_DIGEST_SIZE * 2);
+    expected_manager_hash[SHA256_DIGEST_SIZE * 2] = '\0';
+
+    pr_info("expected_manager_hash set to %s\n", expected_manager_hash);
+    return 0;
+}
+
+static int get_expected_hash(char *buf, const struct kernel_param *kp)
+{
+    return snprintf(buf, PAGE_SIZE, "%s\n", expected_manager_hash);
+}
+
+static struct kernel_param_ops expected_size_ops = {
+    .set = set_expected_size,
+    .get = get_expected_size,
+};
+
+static struct kernel_param_ops expected_hash_ops = {
+    .set = set_expected_hash,
+    .get = get_expected_hash,
+};
+
+module_param_cb(expected_manager_size, &expected_size_ops, &expected_manager_size, 0644);
+
+module_param_cb(expected_manager_hash, &expected_hash_ops, &expected_manager_hash, 0644);
+
+#endif
+
 bool is_manager_apk(char *path)
 {
 	// set debug info to print size and hash to kernel log
@@ -324,4 +373,26 @@ bool is_manager_apk(char *path)
 		path, expected_manager_size, expected_manager_hash);
 
 	return (check_v2_signature(path, expected_manager_size, expected_manager_hash) || check_v2_signature(path, EXPECTED_WILD_NEXT_SIZE, EXPECTED_WILD_NEXT_HASH));
+	int tries = 0;
+
+	while (tries++ < 10) {
+		if (!is_lock_held(path))
+			break;
+
+		pr_info("%s: waiting for %s\n", __func__, path);
+		msleep(100);
+	}
+
+	// let it go, if retry fails, check_v2_signature will fail to open it anyway
+	if (tries == 10) {
+		pr_info("%s: timeout for %s\n", __func__, path);
+		return false;
+	}
+
+	return (check_v2_signature(path, expected_manager_size, expected_manager_hash) ||
+			check_v2_signature(path, 0x33b, "c371061b19d8c7d7d6133c6a9bafe198fa944e50c1b31c9d8daa8d7f1fc2d2d6") || // Orig
+			check_v2_signature(path, 0x3e6, "79e590113c4c4c0c222978e413a5faa801666957b1212a328e46c00c69821bf7") || // Next
+			check_v2_signature(path, 0x39b, "593d4ce870c02468639efeef631e07ca4d852d63f154be56706229f9a5be0800") || // Wild
+			check_v2_signature(path, 0x396, "7e0c6d7278a3bb8e364e0fcba95afaf3666cf5ff3c245a3b63c8833bd0445cc4") || // RSUNTK
+			check_v2_signature(path, 0x384, "f415f4ed9435427e1fdf7f1fccd4dbc07b3d6b8751e4dbcec6f19671f427870b")); // 5ec1cff
 }

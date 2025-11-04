@@ -60,6 +60,7 @@ bool susfs_is_allow_su(void)
 	return ksu_is_allow_uid(current_uid().val);
 }
 
+bool susfs_is_boot_completed_triggered = false;
 extern u32 susfs_zygote_sid;
 extern bool susfs_is_mnt_devname_ksu(struct path *path);
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH

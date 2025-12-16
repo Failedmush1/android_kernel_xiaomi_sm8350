@@ -1,4 +1,4 @@
-Name: Build Kernel
+name: Build Kernel
 on:
   workflow_dispatch:
 jobs:
@@ -46,5 +46,3 @@ jobs:
           tag_name: ${{ env.RELEASE_TAG }}
           files: ${{ env.RELEASE_FILE }}
           generate_release_notes: true
-
-How this?

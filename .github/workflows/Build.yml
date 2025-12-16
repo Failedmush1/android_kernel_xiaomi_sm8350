@@ -33,7 +33,7 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo apt update
-          # Install necessary build dependencies. Removed system GCC to avoid conflicts with Clang.
+          # Install necessary build dependencies. Removed system GCC to rely on the checked-out Clang.
           sudo apt install -y build-essential bc curl git zip ftp libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
           
       - name: Build kernel
@@ -42,7 +42,6 @@ jobs:
           ./build.sh buildksu
           
           # Move the output zip file from the anykernel directory to the root
-          # Note: The output path depends on your build.sh script's logic.
           mv ../out/anykernel/*.zip .
           
           # Robust way to select the first zip file and set environment variables
@@ -59,3 +58,9 @@ jobs:
           path: ${{ env.RELEASE_FILE }}
           
       - name: Create release
+        continue-on-error: true
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: ${{ env.RELEASE_FILE }}
+          generate_release_notes: true

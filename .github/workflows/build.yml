@@ -1,0 +1,48 @@
+name: Build Kernel
+on:
+  workflow_dispatch:
+jobs:
+  build-kernel:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    strategy:
+      max-parallel: 4
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Checkout proton-clang
+        uses: actions/checkout@v4
+        with:
+          repository: kdrag0n/proton-clang
+          path: toolchain
+      - name: Setup PATH
+        run: |
+          echo "${{ github.workspace }}/toolchain/bin" >> $GITHUB_PATH
+      - name: Install prerequisites
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential bc curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
+      - name: Build kernel
+        run: |
+          ./build.sh buildksu
+          mv ../out/anykernel/*.zip .
+          releaseFile=$(set -- *.zip; echo "$1")
+          echo "RELEASE_FILE=$releaseFile" >> $GITHUB_ENV
+          echo "RELEASE_TAG=$(echo $releaseFile | sed 's/.zip$//')" >> $GITHUB_ENV
+      - name: Upload kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: renoir
+          path: ${{ env.RELEASE_FILE }}
+      - name: Create release
+        continue-on-error: true
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: ${{ env.RELEASE_FILE }}
+          generate_release_notes: true

@@ -1,4 +1,4 @@
-name: Build Kernel
+Name: Build Kernel
 on:
   workflow_dispatch:
 jobs:
@@ -15,31 +15,51 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+          
       - name: Checkout proton-clang
         uses: actions/checkout@v4
         with:
           repository: kdrag0n/proton-clang
           path: toolchain
-      - name: Setup PATH
+          
+      - name: Setup PATH and Environment
         run: |
+          # Add toolchain bin directory to PATH
           echo "${{ github.workspace }}/toolchain/bin" >> $GITHUB_PATH
+          # Explicitly set ARCH and CROSS_COMPILE for the build script's environment
+          echo "ARCH=arm64" >> $GITHUB_ENV
+          echo "CROSS_COMPILE=aarch64-linux-gnu-" >> $GITHUB_ENV
+          
       - name: Install prerequisites
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
+          # Use the cross-compiler from the toolchain checkout, 
+          # but install system dependencies.
+          sudo apt install -y build-essential bc curl git zip ftp libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
+          
       - name: Build kernel
         run: |
+          # Assuming build.sh is at the root and handles calling 'make' inside the kernel dir
           ./build.sh buildksu
+          
+          # Move and capture the output zip file
           mv ../out/anykernel/*.zip .
-          releaseFile=$(set -- *.zip; echo "$1")
+          
+          # More robust way to select the file and set environment variables
+          releaseFile=$(ls -1 *.zip | head -n 1)
+          releaseTag=$(basename $releaseFile .zip)
+          
           echo "RELEASE_FILE=$releaseFile" >> $GITHUB_ENV
-          echo "RELEASE_TAG=$(echo $releaseFile | sed 's/.zip$//')" >> $GITHUB_ENV
-      - name: Upload kernel
+          echo "RELEASE_TAG=$releaseTag" >> $GITHUB_ENV
+          
+      - name: Upload kernel Artifact
         uses: actions/upload-artifact@v4
         with:
           name: renoir
           path: ${{ env.RELEASE_FILE }}
-      - name: Create release
+          
+      - name: Create release 
+        # Line 50 was likely here. Check that 'with:' is correctly indented.
         continue-on-error: true
         uses: softprops/action-gh-release@v1
         with:

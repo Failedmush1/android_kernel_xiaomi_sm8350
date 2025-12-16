@@ -1,54 +1,50 @@
-## ⚙️ Standalone Kernel Build - Toolchain Setup Skipped
-
-name: Standalone Kernel Build
-
+Name: Build Kernel
 on:
-  push:
-    # Trigger on push to the LineageOS 23 test branch
-    branches:
-      - lineage-23.0-test 
-  pull_request:
-    # Trigger on PRs targeting the LineageOS 23 test branch
-    branches:
-      - lineage-23.0-test
-
+  workflow_dispatch:
 jobs:
-  build:
-    # Using a modern Ubuntu image, which often has cross-compilers available
-    container: ubuntu:22.04 
-    
+  build-kernel:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    strategy:
+      max-parallel: 4
+      fail-fast: false
     steps:
-    - name: Checkout Source
-      uses: actions/checkout@v4
-      
-    - name: Install Build Dependencies
-      run: |
-        # Installing common dependencies and the system's cross-compiler (aarch64)
-        apt update
-        apt install -y make gcc-aarch64-linux-gnu flex bison libssl-dev bc kmod python3 cpio
-        
-    - name: Set Environment Variables (Minimal)
-      run: |
-        # Set target architecture
-        export ARCH=arm64
-        export SUBARCH=arm64
-        # Relying on the installed system cross-compiler (aarch64-linux-gnu-)
-        export CROSS_COMPILE=aarch64-linux-gnu-
-        
-        echo "ARCH=$ARCH" >> $GITHUB_ENV
-        echo "SUBARCH=$SUBARCH" >> $GITHUB_ENV
-        echo "CROSS_COMPILE=$CROSS_COMPILE" >> $GITHUB_ENV
-        
-    - name: Configure Kernel (Copying .config)
-      run: |
-        cd kernel/xiaomi/sm8350
-        # Copy the final configuration from the successful ROM build path
-        # Adjusting the path below to reference the workspace root
-        cp $GITHUB_WORKSPACE/out/target/product/renoir/obj/KERNEL_OBJ/.config .
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Checkout proton-clang
+        uses: actions/checkout@v4
+        with:
+          repository: kdrag0n/proton-clang
+          path: toolchain
+      - name: Setup PATH
+        run: |
+          echo "${{ github.workspace }}/toolchain/bin" >> $GITHUB_PATH
+      - name: Install prerequisites
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential bc curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
+      - name: Build kernel
+        run: |
+          ./build.sh buildksu
+          mv ../out/anykernel/*.zip .
+          releaseFile=$(set -- *.zip; echo "$1")
+          echo "RELEASE_FILE=$releaseFile" >> $GITHUB_ENV
+          echo "RELEASE_TAG=$(echo $releaseFile | sed 's/.zip$//')" >> $GITHUB_ENV
+      - name: Upload kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: renoir
+          path: ${{ env.RELEASE_FILE }}
+      - name: Create release
+        continue-on-error: true
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: ${{ env.RELEASE_FILE }}
+          generate_release_notes: true
 
-    - name: Build Kernel
-      run: |
-        cd kernel/xiaomi/sm8350
-        # Build using the environment variables set in the previous step
-        # O=out is used to keep the source tree clean
-        make O=out -j$(nproc)
+How this?

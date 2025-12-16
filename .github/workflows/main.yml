@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
           
       - name: Make build.sh Executable
-        run: chmod +x build.sh # <--- ADDED STEP: Ensures the script can be run
+        run: chmod +x build.sh
           
       - name: Checkout proton-clang Toolchain
         uses: actions/checkout@v4
@@ -36,12 +36,10 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo apt update
-          # Install necessary build dependencies. 
           sudo apt install -y build-essential bc curl git zip ftp libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
           
       - name: Build kernel
         run: |
-          # This should now execute successfully:
           ./build.sh buildksu
           
           # Move the output zip file from the anykernel directory to the root

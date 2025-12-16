@@ -10,19 +10,19 @@ jobs:
       max-parallel: 4
       fail-fast: false
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
           
-      - name: Checkout proton-clang
+      - name: Checkout proton-clang Toolchain
         uses: actions/checkout@v4
         with:
           repository: kdrag0n/proton-clang
           path: toolchain
           
-      - name: Setup PATH and Environment
+      - name: Setup PATH and Environment Variables
         run: |
           # Add toolchain bin directory to PATH
           echo "${{ github.workspace }}/toolchain/bin" >> $GITHUB_PATH
@@ -33,19 +33,19 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo apt update
-          # Use the cross-compiler from the toolchain checkout, 
-          # but install system dependencies.
+          # Install necessary build dependencies. Removed system GCC to avoid conflicts with Clang.
           sudo apt install -y build-essential bc curl git zip ftp libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
           
       - name: Build kernel
         run: |
-          # Assuming build.sh is at the root and handles calling 'make' inside the kernel dir
+          # Executes your custom build script
           ./build.sh buildksu
           
-          # Move and capture the output zip file
+          # Move the output zip file from the anykernel directory to the root
+          # Note: The output path depends on your build.sh script's logic.
           mv ../out/anykernel/*.zip .
           
-          # More robust way to select the file and set environment variables
+          # Robust way to select the first zip file and set environment variables
           releaseFile=$(ls -1 *.zip | head -n 1)
           releaseTag=$(basename $releaseFile .zip)
           
@@ -58,11 +58,4 @@ jobs:
           name: renoir
           path: ${{ env.RELEASE_FILE }}
           
-      - name: Create release 
-        # Line 50 was likely here. Check that 'with:' is correctly indented.
-        continue-on-error: true
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          files: ${{ env.RELEASE_FILE }}
-          generate_release_notes: true
+      - name: Create release

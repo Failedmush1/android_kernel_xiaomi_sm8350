@@ -4,28 +4,24 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=RedCherry+ Kernel
-kernel.compiler=clang-r530567
-kernel.made=Arindam Bhattacharjee
-kernel.version=4.14.336
-message.word=Thank you for installing RedCherry+ Kernel
+kernel.string=Renoir Kernel
+kernel.compiler=Clang
+kernel.made=Gemini
+kernel.version=5.4
+message.word=Enjoy your new kernel!
 do.devicecheck=1
 do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
-device.name1=miatoll
-device.name2=curtana
-device.name3=excalibur
-device.name4=gram
-device.name5=joyeuse
+device.name1=renoir
 supported.versions=
 supported.patchlevels=
 '; } # end properties
 
 # shell variables
-block=/dev/block/bootdevice/by-name/boot;
-is_slot_device=0;
+block=/dev/block/bootdevice/by-name/vendor_boot;
+is_slot_device=1;
 ramdisk_compression=auto;
 patch_vbmeta_flag=auto;
 

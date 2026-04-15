@@ -156,3 +156,4 @@ Android.bp
 *.dtbo
 *.dtb
 Image
+*.zip

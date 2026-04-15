@@ -20,4 +20,4 @@ make olddefconfig
 
 # 4. Build the Kernel and Device Tree Blobs
 echo "Starting build..."
-make -j$(nproc) Image dtbs
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang CLANG_TRIPLE=aarch64-linux-gnu- LD=ld.lld -j$(nproc) Image dtbs

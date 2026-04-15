@@ -3,6 +3,11 @@ obj-m += rmnet_ctl.o
 rmnet_core-y := rmnet_config.o rmnet_handlers.o rmnet_descriptor.o \
 	rmnet_genl.o rmnet_map_command.o rmnet_map_data.o rmnet_vnd.o\
 	qmi_rmnet.o wda_qmi.o dfc_qmi.o dfc_qmap.o
+
+CFLAGS_wda_qmi.o := -I$(src)
+CFLAGS_dfc_qmi.o := -I$(src)
+CFLAGS_rmnet_handlers.o := -I$(src)
+
 rmnet_ctl-y := rmnet_ctl_client.o rmnet_ctl_ipa.o
 
 

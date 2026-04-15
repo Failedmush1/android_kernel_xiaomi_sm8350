@@ -4,17 +4,6 @@ ccflags-y += -I $(srctree)/$(src)/disp/dpu1
 ccflags-$(CONFIG_DRM_MSM_DSI) += -I $(srctree)/$(src)/dsi
 
 msm-y := \
-	adreno/adreno_device.o \
-	adreno/adreno_gpu.o \
-	adreno/a2xx_gpu.o \
-	adreno/a3xx_gpu.o \
-	adreno/a4xx_gpu.o \
-	adreno/a5xx_gpu.o \
-	adreno/a5xx_power.o \
-	adreno/a5xx_preempt.o \
-	adreno/a6xx_gpu.o \
-	adreno/a6xx_gmu.o \
-	adreno/a6xx_hfi.o \
 	hdmi/hdmi.o \
 	hdmi/hdmi_audio.o \
 	hdmi/hdmi_bridge.o \
@@ -30,6 +19,39 @@ msm-y := \
 	edp/edp_connector.o \
 	edp/edp_ctrl.o \
 	edp/edp_phy.o \
+	msm_atomic.o \
+	msm_atomic_tracepoints.o \
+	msm_debugfs.o \
+	msm_drv.o \
+	msm_fb.o \
+	msm_fence.o \
+	msm_gem.o \
+	msm_gem_prime.o \
+	msm_gem_shrinker.o \
+	msm_gem_submit.o \
+	msm_gem_vma.o \
+	msm_gpu.o \
+	msm_iommu.o \
+	msm_perf.o \
+	msm_rd.o \
+	msm_ringbuffer.o \
+	msm_submitqueue.o \
+	msm_gpu_tracepoints.o \
+	msm_gpummu.o
+
+ifneq ($(CONFIG_DISPLAY_BUILD), y)
+msm-y += \
+	adreno/adreno_device.o \
+	adreno/adreno_gpu.o \
+	adreno/a2xx_gpu.o \
+	adreno/a3xx_gpu.o \
+	adreno/a4xx_gpu.o \
+	adreno/a5xx_gpu.o \
+	adreno/a5xx_power.o \
+	adreno/a5xx_preempt.o \
+	adreno/a6xx_gpu.o \
+	adreno/a6xx_gmu.o \
+	adreno/a6xx_hfi.o \
 	disp/mdp_format.o \
 	disp/mdp_kms.o \
 	disp/mdp4/mdp4_crtc.o \
@@ -73,30 +95,14 @@ msm-y := \
 	disp/dpu1/dpu_mdss.o \
 	disp/dpu1/dpu_plane.o \
 	disp/dpu1/dpu_rm.o \
-	disp/dpu1/dpu_vbif.o \
-	msm_atomic.o \
-	msm_atomic_tracepoints.o \
-	msm_debugfs.o \
-	msm_drv.o \
-	msm_fb.o \
-	msm_fence.o \
-	msm_gem.o \
-	msm_gem_prime.o \
-	msm_gem_shrinker.o \
-	msm_gem_submit.o \
-	msm_gem_vma.o \
-	msm_gpu.o \
-	msm_iommu.o \
-	msm_perf.o \
-	msm_rd.o \
-	msm_ringbuffer.o \
-	msm_submitqueue.o \
-	msm_gpu_tracepoints.o \
-	msm_gpummu.o
+	disp/dpu1/dpu_vbif.o
+endif
 
+ifneq ($(CONFIG_DISPLAY_BUILD), y)
 msm-$(CONFIG_DEBUG_FS) += adreno/a5xx_debugfs.o
 
 msm-$(CONFIG_DRM_MSM_GPU_STATE)	+= adreno/a6xx_gpu_state.o
+endif
 
 msm-$(CONFIG_DRM_FBDEV_EMULATION) += msm_fbdev.o
 msm-$(CONFIG_COMMON_CLK) += disp/mdp4/mdp4_lvds_pll.o
@@ -105,6 +111,7 @@ msm-$(CONFIG_COMMON_CLK) += hdmi/hdmi_phy_8996.o
 
 msm-$(CONFIG_DRM_MSM_HDMI_HDCP) += hdmi/hdmi_hdcp.o
 
+ifneq ($(CONFIG_DISPLAY_BUILD), y)
 msm-$(CONFIG_DRM_MSM_DSI) += dsi/dsi.o \
 			disp/mdp4/mdp4_dsi_encoder.o \
 			dsi/dsi_cfg.o \
@@ -125,6 +132,7 @@ msm-$(CONFIG_DRM_MSM_DSI_28NM_PHY) += dsi/pll/dsi_pll_28nm.o
 msm-$(CONFIG_DRM_MSM_DSI_28NM_8960_PHY) += dsi/pll/dsi_pll_28nm_8960.o
 msm-$(CONFIG_DRM_MSM_DSI_14NM_PHY) += dsi/pll/dsi_pll_14nm.o
 msm-$(CONFIG_DRM_MSM_DSI_10NM_PHY) += dsi/pll/dsi_pll_10nm.o
+endif
 endif
 
 obj-$(CONFIG_DRM_MSM)	+= msm.o

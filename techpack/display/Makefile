@@ -60,7 +60,7 @@ ifeq ($(CONFIG_ARCH_MONACO), y)
 LINUXINCLUDE    += -include $(srctree)/techpack/display/config/monacodispconf.h
 endif
 
-obj-$(CONFIG_DRM_MSM) += msm/
+obj-$(CONFIG_DISPLAY_BUILD) += msm/
 
 ifeq ($(CONFIG_ARCH_SDXLEMUR), y)
 include $(srctree)/techpack/display/config/sdxlemurdisp.conf

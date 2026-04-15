@@ -18,9 +18,9 @@ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang CLANG_TRIPLE=aarch64-l
 echo "Syncing configuration..."
 make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang CLANG_TRIPLE=aarch64-linux-gnu- LD=ld.lld olddefconfig
 
-# 4. Build the Kernel and Device Tree Blobs
+# 4. Build the Kernel, Device Tree Blobs, and Modules
 echo "Starting build..."
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang CLANG_TRIPLE=aarch64-linux-gnu- LD=ld.lld -j$(nproc) Image dtbs
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang CLANG_TRIPLE=aarch64-linux-gnu- LD=ld.lld -j$(nproc) Image dtbs modules
 
 # 5. Package with AnyKernel3
 echo "Packaging with AnyKernel3..."

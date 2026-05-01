@@ -94,9 +94,11 @@ typedef unsigned long sigset_t;
 #include <asm-generic/signal-defs.h>
 
 #ifndef __KERNEL__
+#ifndef __sigaction_defined
+#define __sigaction_defined
 /* Here we must cater to libcs that poke about in kernel headers.  */
 
-struct sigaction {
+struct __kernel_sigaction {
 	union {
 	  __sighandler_t _sa_handler;
 	  void (*_sa_sigaction)(int, struct siginfo *, void *);
@@ -108,7 +110,7 @@ struct sigaction {
 
 #define sa_handler	_u._sa_handler
 #define sa_sigaction	_u._sa_sigaction
-
+#endif
 #endif /* __KERNEL__ */
 
 typedef struct sigaltstack {

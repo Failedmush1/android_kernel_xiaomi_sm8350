@@ -872,86 +872,86 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
         if (cmd == CMD_SUSFS_ADD_SUS_PATH) {
             susfs_add_sus_path(arg);
-            return 0;
+            return 1;
         }
         if (cmd == CMD_SUSFS_ADD_SUS_PATH_LOOP) {
             susfs_add_sus_path_loop(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_SUS_PATH
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
         if (cmd == CMD_SUSFS_HIDE_SUS_MNTS_FOR_NON_SU_PROCS) {
             susfs_set_hide_sus_mnts_for_non_su_procs(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
         if (cmd == CMD_SUSFS_ADD_SUS_KSTAT) {
             susfs_add_sus_kstat(arg);
-            return 0;
+            return 1;
         }
         if (cmd == CMD_SUSFS_UPDATE_SUS_KSTAT) {
             susfs_update_sus_kstat(arg);
-            return 0;
+            return 1;
         }
         if (cmd == CMD_SUSFS_ADD_SUS_KSTAT_STATICALLY) {
             susfs_add_sus_kstat(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
 #ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
         if (cmd == CMD_SUSFS_ADD_TRY_UMOUNT) {
             add_try_umount(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
 #ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
         if (cmd == CMD_SUSFS_SET_UNAME) {
             susfs_set_uname(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
 #ifdef CONFIG_KSU_SUSFS_ENABLE_LOG
         if (cmd == CMD_SUSFS_ENABLE_LOG) {
             susfs_enable_log(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_ENABLE_LOG
 #ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
         if (cmd == CMD_SUSFS_SET_CMDLINE_OR_BOOTCONFIG) {
             susfs_set_cmdline_or_bootconfig(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
 #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
         if (cmd == CMD_SUSFS_ADD_OPEN_REDIRECT) {
             susfs_add_open_redirect(arg);
-            return 0;
+            return 1;
         }
 #endif //#ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
 #ifdef CONFIG_KSU_SUSFS_SUS_MAP
         if (cmd == CMD_SUSFS_ADD_SUS_MAP) {
             susfs_add_sus_map(arg);
-            return 0;
+            return 1;
         }
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_MAP
         if (cmd == CMD_SUSFS_ENABLE_AVC_LOG_SPOOFING) {
             susfs_set_avc_log_spoofing(arg);
-            return 0;
+            return 1;
         }
         if (cmd == CMD_SUSFS_SHOW_ENABLED_FEATURES) {
             susfs_get_enabled_features(arg);
-            return 0;
+            return 1;
         }
         if (cmd == CMD_SUSFS_SHOW_VARIANT) {
             susfs_show_variant(arg);
-            return 0;
+            return 1;
         }
         if (cmd == CMD_SUSFS_SHOW_VERSION) {
             susfs_show_version(arg);
-            return 0;
+            return 1;
         }
-        return 0;
+        return 1;
     }
 #endif // #ifdef CONFIG_KSU_SUSFS
 	// Check if this is a request to install KSU fd
@@ -966,7 +966,7 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 		__close_fd(current->files, fd);
 #endif
 		}
-		return 0;
+		return 1;
 	}
 
 	// extensions 
@@ -975,7 +975,7 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 	if (magic2 == CHANGE_MANAGER_UID) {
 		// only root is allowed for this command
 		if (current_uid().val != 0)
-			return 0;
+			return 1;
 
 		pr_info("sys_reboot: ksu_set_manager_appid to: %d\n", cmd);
 		ksu_set_manager_appid(cmd);
@@ -985,32 +985,32 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 				pr_info("sys_reboot: reply fail\n");
 		}
 
-		return 0;
+		return 1;
 	}
 	
 	if (magic2 == GET_SULOG_DUMP_V2) {
 		// only root is allowed for this command
 		if (current_uid().val != 0)
-			return 0;
+			return 1;
 
 		int ret = send_sulog_dump(*arg);
 		if (ret)
-			return 0;
+			return 1;
 
 		if (copy_to_user((void __user *)*arg, &reply, sizeof(reply) ))
-			return 0;
+			return 1;
 	}
 
 	if (magic2 == CHANGE_KSUVER) {
 		// only root is allowed for this command
 		if (current_uid().val != 0)
-			return 0;
+			return 1;
 
 		pr_info("sys_reboot: ksu_change_ksuver to: %d\n", cmd);
 		ksuver_override = cmd;
 
 		if (copy_to_user((void __user *)*arg, &reply, sizeof(reply) ))
-			return 0;
+			return 1;
 	}
 
 	// WARNING!!! triple ptr zone! ***
@@ -1018,7 +1018,7 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 	if (magic2 == CHANGE_SPOOF_UNAME) {
 		// only root is allowed for this command 
 		if (current_uid().val != 0)
-			return 0;
+			return 1;
 
 		char release_buf[65];
 		char version_buf[65];
@@ -1037,7 +1037,7 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 
 		// arg here is ***, dereference to pull out **
 		if (copy_from_user(&u_pptr, (void __user *)*ppptr, sizeof(u_pptr)))
-			return 0;
+			return 1;
 
 		pr_info("sys_reboot: u_pptr: 0x%lx \n", u_pptr);
 
@@ -1045,18 +1045,18 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 		// we cannot dereference this as this is __user
 		// we just do another copy_from_user to get it
 		if (copy_from_user(&u_ptr, (void __user *)u_pptr, sizeof(u_ptr)))
-			return 0;
+			return 1;
 
 		pr_info("sys_reboot: u_ptr: 0x%lx \n", u_ptr);
 
 		// for release
 		if (strncpy_from_user(release_buf, (char __user *)u_ptr, sizeof(release_buf)) < 0)
-			return 0;
+			return 1;
 		release_buf[sizeof(release_buf) - 1] = '\0'; 
 
 		// for version
 		if (strncpy_from_user(version_buf, (char __user *)(u_ptr + strlen(release_buf) + 1), sizeof(version_buf)) < 0)
-			return 0;
+			return 1;
 		version_buf[sizeof(version_buf) - 1] = '\0'; 
 
 		if (original_release_buf[0] == '\0') {
@@ -1084,10 +1084,10 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
 
 		// we write our confirmation on **
 		if (copy_to_user((void __user *)*arg, &reply, sizeof(reply)))
-			return 0;
+			return 1;
 	}
 
-	return 0;
+	return 1;
 }
 
 #if defined(KSU_KPROBES_HOOK) && !defined(CONFIG_KSU_SUSFS)

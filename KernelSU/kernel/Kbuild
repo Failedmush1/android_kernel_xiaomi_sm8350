@@ -62,8 +62,8 @@ KSU_SRC := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 LOCAL_GIT_EXISTS := $(shell test -e $(KSU_SRC)/../.git && echo 1 || echo 0)
 
 ifeq ($(LOCAL_GIT_EXISTS),0)
-KSU_LOCAL_VERSION := 4479
-KSU_VERSION := 35179
+KSU_LOCAL_VERSION := 10096
+KSU_VERSION := 40796
 KSU_TAG_NAME    := v4.2.0
 KSU_COMMIT_SHA  := 0e469895
 KSU_BRANCH_NAME := main

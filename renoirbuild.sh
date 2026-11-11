@@ -61,16 +61,8 @@ echo "=========================================================="
 
 mkdir -p "${OUT_DIR}"
 
-echo "[*] Merging defconfigs for renoir..."
-"${KERNEL_DIR}/scripts/kconfig/merge_config.sh" -m -O "${OUT_DIR}" \
-    "${KERNEL_DIR}/arch/arm64/configs/vendor/lahaina-qgki_defconfig" \
-    "${KERNEL_DIR}/arch/arm64/configs/vendor/debugfs.config" \
-    "${KERNEL_DIR}/arch/arm64/configs/vendor/xiaomi_QGKI.config" \
-    "${KERNEL_DIR}/arch/arm64/configs/vendor/renoir_QGKI.config"
-
-echo "[*] Generating final .config..."
-make "${BUILD_FLAGS[@]}" olddefconfig
-
+echo "[*] Generating .config from vendor/renoir_defconfig..."
+make "${BUILD_FLAGS[@]}" vendor/renoir_defconfig
 echo "[*] Compiling Kernel Image, Device Trees & Modules..."
 make -j${THREAD} "${BUILD_FLAGS[@]}" Image dtbs modules
 echo "[*] Installing modules to temporary directory..."

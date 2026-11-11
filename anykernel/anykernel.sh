@@ -1,0 +1,65 @@
+### AnyKernel3 Ramdisk Mod Script
+## osm0sis @ xda-developers
+
+### AnyKernel setup
+# global properties
+properties() { '
+kernel.string=Cherrish Kernel 5.4.302 for Xiaomi Mi 11 Lite 5G (renoir) by Failedmush
+do.devicecheck=0
+do.modules=1
+do.systemless=1
+do.cleanup=1
+do.cleanuponabort=0
+device.name1=renoir
+device.name2=renoir_in
+device.name3=M2101K9G
+device.name4=M2101K9R
+device.name5=M2101K9C
+supported.versions=11.0-17.0
+supported.patchlevels=
+supported.vendorpatchlevels=
+'; } # end properties
+
+### AnyKernel install
+## boot files attributes
+boot_attributes() {
+set_perm_recursive 0 0 755 644 $RAMDISK/*;
+set_perm_recursive 0 0 750 750 $RAMDISK/init* $RAMDISK/sbin;
+} # end attributes
+
+## boot shell variables
+BLOCK=boot;
+IS_SLOT_DEVICE=1;
+RAMDISK_COMPRESSION=auto;
+PATCH_VBMETA_FLAG=auto;
+
+# import functions/variables and setup patching - see for reference (DO NOT REMOVE)
+. tools/ak3-core.sh;
+
+# boot install
+dump_boot; # use split_boot to skip ramdisk unpack, e.g. for devices with init_boot ramdisk
+
+write_boot; # use flash_boot to skip ramdisk repack, e.g. for devices with init_boot ramdisk
+## end boot install
+
+## vendor_boot files attributes
+vendor_boot_attributes() {
+set_perm_recursive 0 0 755 644 $RAMDISK/*;
+set_perm_recursive 0 0 750 750 $RAMDISK/init* $RAMDISK/sbin;
+}
+# end attributes
+
+## vendor_boot shell variables
+BLOCK=vendor_boot;
+IS_SLOT_DEVICE=1;
+RAMDISK_COMPRESSION=auto;
+PATCH_VBMETA_FLAG=auto;
+
+# reset for vendor_boot patching
+reset_ak;
+
+# vendor_boot install
+split_boot;
+
+flash_boot;
+## end vendor_boot install

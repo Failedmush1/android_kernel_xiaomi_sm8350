@@ -93,7 +93,7 @@ typedef unsigned long sigset_t;
 
 #include <asm-generic/signal-defs.h>
 
-#ifndef __KERNEL__
+#if !defined(__BIONIC__) && !defined(__KERNEL__)
 /* Here we must cater to libcs that poke about in kernel headers.  */
 
 struct sigaction {
@@ -108,8 +108,20 @@ struct sigaction {
 
 #define sa_handler	_u._sa_handler
 #define sa_sigaction	_u._sa_sigaction
+#else
+struct __kernel_sigaction {
+	union {
+	  __sighandler_t _sa_handler;
+	  void (*_sa_sigaction)(int, struct siginfo *, void *);
+	} _u;
+	sigset_t sa_mask;
+	unsigned long sa_flags;
+	void (*sa_restorer)(void);
+};
 
-#endif /* __KERNEL__ */
+#define sa_handler	_u._sa_handler
+#define sa_sigaction	_u._sa_sigaction
+#endif
 
 typedef struct sigaltstack {
 	void __user *ss_sp;

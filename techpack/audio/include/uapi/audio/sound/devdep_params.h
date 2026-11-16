@@ -2,7 +2,9 @@
 #define _DEV_DEP_H
 
 #include <linux/types.h>
-
+#ifndef __user
+#define __user
+#endif
 struct dolby_param_data {
 	__s32 version;
 	__s32 device_id;

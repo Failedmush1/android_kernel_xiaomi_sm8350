@@ -819,6 +819,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, undefined-optimized)
 # because -Wuninitialized will still flag when an uninitialized const variable
 # is used.
 KBUILD_CFLAGS += $(call cc-disable-warning, default-const-init-unsafe)
+KBUILD_CFLAGS += $(call cc-disable-warning, enum-enum-cast)
+KBUILD_CFLAGS += $(call cc-disable-warning, implicit-enum-enum-cast)
 else
 
 # Warn about unmarked fall-throughs in switch statement.

@@ -41,6 +41,9 @@ config LD_IS_LLD
 	def_bool $(success,$(LD) -v | head -n 1 | grep -q LLD)
 config AS_IS_LLVM
 	def_bool y
+config KFENCE
+	def_bool y
+
 
 
 config CLANG_VERSION
